@@ -498,8 +498,6 @@ function StatCard({
   delta,
   positive,
   icon: Icon,
-  accent,
-  data,
 }: {
   label: string;
   value: string;
@@ -509,72 +507,48 @@ function StatCard({
   accent: string;
   data: readonly number[];
 }) {
-  const accentColor =
-    accent === "danger"
-      ? "oklch(0.637 0.213 25)"
-      : accent === "warning"
-        ? "oklch(0.771 0.16 70)"
-        : accent === "success"
-          ? "oklch(0.7 0.153 163)"
-          : "oklch(0.564 0.213 261)";
-
-  const chartData = data.map((v, i) => ({ i, v }));
-
+  const isNeutral = delta === "0%" || delta.startsWith("+0") || delta === "-2";
   return (
     <div className="card-elegant card-hover p-5 group">
-      <div className="flex items-start justify-between">
-        <div
-          className="grid h-10 w-10 place-items-center rounded-xl transition-transform group-hover:scale-105"
-          style={{
-            background: `color-mix(in oklab, ${accentColor} 10%, transparent)`,
-            color: accentColor,
-          }}
-        >
-          <Icon className="h-[18px] w-[18px]" strokeWidth={2.2} />
+      <div className="flex items-center justify-between">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+          {label}
         </div>
-        <div
-          className={cn(
-            "inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[11px] font-semibold",
-            positive ? "text-success" : "text-danger",
-          )}
-          style={{
-            background: positive
-              ? "color-mix(in oklab, oklch(0.7 0.153 163) 12%, transparent)"
-              : "color-mix(in oklab, oklch(0.637 0.213 25) 12%, transparent)",
-          }}
-        >
-          {positive ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-          {delta}
+        <Icon
+          className="h-4 w-4 text-muted-foreground/70 group-hover:text-primary transition-colors"
+          strokeWidth={2}
+        />
+      </div>
+      <div className="mt-5 flex items-baseline gap-2">
+        <div className="text-[28px] font-bold tracking-[-0.02em] leading-none text-foreground">
+          {value}
         </div>
       </div>
-      <div className="mt-4 flex items-end justify-between gap-3">
-        <div className="min-w-0">
-          <div className="text-[26px] font-bold tracking-[-0.02em] leading-none">{value}</div>
-          <div className="mt-2 text-[13px] text-muted-foreground truncate">{label}</div>
-        </div>
-        <div className="h-10 w-20 shrink-0 opacity-90">
-          <ResponsiveContainer>
-            <AreaChart data={chartData} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id={`spark-${label}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={accentColor} stopOpacity={0.4} />
-                  <stop offset="100%" stopColor={accentColor} stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <Area
-                type="monotone"
-                dataKey="v"
-                stroke={accentColor}
-                strokeWidth={1.8}
-                fill={`url(#spark-${label})`}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
+      <div className="mt-3 flex items-center gap-1.5 text-[12px]">
+        <span
+          className={cn(
+            "inline-flex items-center gap-0.5 font-semibold",
+            isNeutral
+              ? "text-muted-foreground"
+              : positive
+                ? "text-success"
+                : "text-danger",
+          )}
+        >
+          {!isNeutral &&
+            (positive ? (
+              <ArrowUpRight className="h-3 w-3" strokeWidth={2.6} />
+            ) : (
+              <ArrowDownRight className="h-3 w-3" strokeWidth={2.6} />
+            ))}
+          {delta}
+        </span>
+        <span className="text-muted-foreground">vs. mois dernier</span>
       </div>
     </div>
   );
 }
+
 
 /* ---------- Chart helpers ---------- */
 
