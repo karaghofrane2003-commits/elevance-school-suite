@@ -1,24 +1,31 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { DashboardShell } from "@/components/dashboard/shell";
+import { DashboardHome } from "@/components/dashboard/home";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Tableau de bord — Scolaris" },
+      {
+        name: "description",
+        content:
+          "Pilotage global de votre établissement : élèves, absences, annonces, activité des parents et professeurs.",
+      },
+      { property: "og:title", content: "Tableau de bord — Scolaris" },
+      {
+        property: "og:description",
+        content:
+          "Une vue d'ensemble élégante et complète de votre école, en temps réel.",
+      },
+    ],
+  }),
+  component: Page,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Page() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <DashboardShell>
+      <DashboardHome />
+    </DashboardShell>
   );
 }
