@@ -43,7 +43,7 @@ type NavItem = { label: string; icon: typeof LayoutDashboard; badge?: string; ac
 
 const navMain: NavItem[] = [
   { label: "Tableau de bord", icon: LayoutDashboard, to: "/" },
-  { label: "Élèves", icon: GraduationCap, badge: "842" },
+  { label: "Élèves", icon: GraduationCap, badge: "842", to: "/eleves" },
   { label: "Parents", icon: Users2 },
   { label: "Professeurs", icon: UserSquare2 },
   { label: "Classes", icon: School },
