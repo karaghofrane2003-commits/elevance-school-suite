@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Bell,
   ChevronDown,
@@ -38,15 +39,15 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
-type NavItem = { label: string; icon: typeof LayoutDashboard; badge?: string; active?: boolean };
+type NavItem = { label: string; icon: typeof LayoutDashboard; badge?: string; active?: boolean; to?: string };
 
 const navMain: NavItem[] = [
-  { label: "Tableau de bord", icon: LayoutDashboard, active: true },
+  { label: "Tableau de bord", icon: LayoutDashboard, to: "/" },
   { label: "Élèves", icon: GraduationCap, badge: "842" },
   { label: "Parents", icon: Users2 },
   { label: "Professeurs", icon: UserSquare2 },
   { label: "Classes", icon: School },
-  { label: "Annonces", icon: Megaphone, badge: "3" },
+  { label: "Annonces", icon: Megaphone, badge: "3", to: "/annonces" },
   { label: "Calendrier", icon: CalendarDays },
   { label: "Absences", icon: UserX, badge: "12" },
   { label: "Messages", icon: MessageSquare, badge: "5" },
@@ -190,6 +191,7 @@ function NavGroup({
   items: NavItem[];
   collapsed: boolean;
 }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <div>
       {!collapsed && (
@@ -200,44 +202,55 @@ function NavGroup({
       <ul className="space-y-0.5">
         {items.map((item) => {
           const Icon = item.icon;
+          const active = item.to ? pathname === item.to : false;
+          const inner = (
+            <>
+              {active && (
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-primary" />
+              )}
+              <Icon className={cn("h-[18px] w-[18px] shrink-0", active && "text-primary")} strokeWidth={active ? 2.4 : 2} />
+              {!collapsed && (
+                <>
+                  <span className="flex-1 text-left truncate">{item.label}</span>
+                  {item.badge && (
+                    <span
+                      className={cn(
+                        "text-[10px] font-semibold px-1.5 py-0.5 rounded-md",
+                        active
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground",
+                      )}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
+                </>
+              )}
+            </>
+          );
+          const className = cn(
+            "group relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all",
+            active
+              ? "bg-primary/8 text-primary"
+              : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
+            collapsed && "justify-center px-2",
+          );
           return (
             <li key={item.label}>
-              <button
-                className={cn(
-                  "group relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all",
-                  item.active
-                    ? "bg-primary/8 text-primary"
-                    : "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground",
-                  collapsed && "justify-center px-2",
-                )}
-                title={collapsed ? item.label : undefined}
-              >
-                {item.active && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-primary" />
-                )}
-                <Icon className={cn("h-[18px] w-[18px] shrink-0", item.active && "text-primary")} strokeWidth={item.active ? 2.4 : 2} />
-                {!collapsed && (
-                  <>
-                    <span className="flex-1 text-left truncate">{item.label}</span>
-                    {item.badge && (
-                      <span
-                        className={cn(
-                          "text-[10px] font-semibold px-1.5 py-0.5 rounded-md",
-                          item.active
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted text-muted-foreground",
-                        )}
-                      >
-                        {item.badge}
-                      </span>
-                    )}
-                  </>
-                )}
-              </button>
+              {item.to ? (
+                <Link to={item.to} className={className} title={collapsed ? item.label : undefined}>
+                  {inner}
+                </Link>
+              ) : (
+                <button className={className} title={collapsed ? item.label : undefined}>
+                  {inner}
+                </button>
+              )}
             </li>
           );
         })}
       </ul>
+
     </div>
   );
 }
