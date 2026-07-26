@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Bell,
   ChevronDown,
@@ -38,15 +39,15 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
-type NavItem = { label: string; icon: typeof LayoutDashboard; badge?: string; active?: boolean };
+type NavItem = { label: string; icon: typeof LayoutDashboard; badge?: string; active?: boolean; to?: string };
 
 const navMain: NavItem[] = [
-  { label: "Tableau de bord", icon: LayoutDashboard, active: true },
+  { label: "Tableau de bord", icon: LayoutDashboard, to: "/" },
   { label: "Élèves", icon: GraduationCap, badge: "842" },
   { label: "Parents", icon: Users2 },
   { label: "Professeurs", icon: UserSquare2 },
   { label: "Classes", icon: School },
-  { label: "Annonces", icon: Megaphone, badge: "3" },
+  { label: "Annonces", icon: Megaphone, badge: "3", to: "/annonces" },
   { label: "Calendrier", icon: CalendarDays },
   { label: "Absences", icon: UserX, badge: "12" },
   { label: "Messages", icon: MessageSquare, badge: "5" },
@@ -190,6 +191,7 @@ function NavGroup({
   items: NavItem[];
   collapsed: boolean;
 }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <div>
       {!collapsed && (
@@ -200,7 +202,6 @@ function NavGroup({
       <ul className="space-y-0.5">
         {items.map((item) => {
           const Icon = item.icon;
-          const pathname = useRouterState({ select: (s) => s.location.pathname });
           const active = item.to ? pathname === item.to : false;
           const inner = (
             <>
