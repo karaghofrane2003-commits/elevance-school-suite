@@ -76,6 +76,8 @@ type Student = {
   attendance: number;
   average: number;
   feesPaid: boolean;
+  absentToday: boolean;
+  schoolYear: string;
   notes: string;
 };
 
@@ -93,6 +95,8 @@ const classes = [
   "Terminale S",
 ];
 const levels = ["Primaire", "Collège", "Lycée"];
+const schoolYears = ["2025-2026", "2024-2025", "2023-2024"];
+const currentSchoolYear = schoolYears[0];
 
 const seed: Student[] = [
   ["Amina", "Bensalem", "6ème A", "Collège", 0.97, 15.8, true, "F"],
