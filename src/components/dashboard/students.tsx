@@ -13,7 +13,6 @@ import {
   Download,
   Users2,
   UserCheck,
-  UserX,
   Percent,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -56,10 +55,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 
-type Status = "active" | "suspended" | "graduated";
 type Gender = "F" | "M";
 
 type Student = {
@@ -71,7 +68,6 @@ type Student = {
   birthDate: string;
   className: string;
   level: string;
-  status: Status;
   enrolledAt: string;
   guardianName: string;
   guardianPhone: string;
@@ -83,33 +79,41 @@ type Student = {
   notes: string;
 };
 
-const classes = ["6ème A", "6ème B", "5ème A", "4ème B", "3ème A", "2nde C", "1ère S", "Terminale S"];
-const levels = ["Collège", "Lycée"];
-
-const statusLabels: Record<Status, string> = {
-  active: "Actif",
-  suspended: "Suspendu",
-  graduated: "Diplômé",
-};
-
-const statusDot: Record<Status, string> = {
-  active: "bg-[var(--success)]",
-  suspended: "bg-[var(--warning)]",
-  graduated: "bg-muted-foreground/50",
-};
+const classes = [
+  "CP A",
+  "CE1 A",
+  "CM2 B",
+  "6ème A",
+  "6ème B",
+  "5ème A",
+  "4ème B",
+  "3ème A",
+  "2nde C",
+  "1ère S",
+  "Terminale S",
+];
+const levels = ["Primaire", "Collège", "Lycée"];
 
 const seed: Student[] = [
-  ["Amina", "Bensalem", "6ème A", "Collège", "active", 0.97, 15.8, true, "F"],
-  ["Lucas", "Moreau", "5ème A", "Collège", "active", 0.91, 13.2, true, "M"],
-  ["Inès", "Charef", "3ème A", "Collège", "suspended", 0.74, 10.4, false, "F"],
-  ["Noah", "Petit", "2nde C", "Lycée", "active", 0.95, 14.6, true, "M"],
-  ["Sofia", "Ricci", "1ère S", "Lycée", "active", 0.88, 16.9, false, "F"],
-  ["Youssef", "Haddad", "Terminale S", "Lycée", "graduated", 0.99, 17.4, true, "M"],
-  ["Camille", "Durand", "4ème B", "Collège", "active", 0.83, 12.1, true, "F"],
-  ["Adam", "Lefèvre", "6ème B", "Collège", "active", 0.93, 14.0, false, "M"],
+  ["Amina", "Bensalem", "6ème A", "Collège", 0.97, 15.8, true, "F"],
+  ["Lucas", "Moreau", "5ème A", "Collège", 0.91, 13.2, true, "M"],
+  ["Inès", "Charef", "CM2 B", "Primaire", 0.74, 10.4, false, "F"],
+  ["Noah", "Petit", "2nde C", "Lycée", 0.95, 14.6, true, "M"],
+  ["Sofia", "Ricci", "1ère S", "Lycée", 0.88, 16.9, false, "F"],
+  ["Youssef", "Haddad", "Terminale S", "Lycée", 0.99, 17.4, true, "M"],
+  ["Camille", "Durand", "CP A", "Primaire", 0.83, 12.1, true, "F"],
+  ["Adam", "Lefèvre", "6ème B", "Collège", 0.93, 14.0, false, "M"],
 ].map((row, i) => {
-  const [firstName, lastName, className, level, status, attendance, average, feesPaid, gender] =
-    row as [string, string, string, string, Status, number, number, boolean, Gender];
+  const [firstName, lastName, className, level, attendance, average, feesPaid, gender] = row as [
+    string,
+    string,
+    string,
+    string,
+    number,
+    number,
+    boolean,
+    Gender,
+  ];
   return {
     id: `s${i + 1}`,
     firstName,
@@ -119,7 +123,6 @@ const seed: Student[] = [
     birthDate: `20${10 + (i % 5)}-0${(i % 9) + 1}-1${i % 9}`,
     className,
     level,
-    status,
     enrolledAt: `202${3 + (i % 3)}-09-01`,
     guardianName: `M./Mme ${lastName}`,
     guardianPhone: `+33 6 12 34 5${i} ${10 + i}`,
@@ -140,7 +143,6 @@ const emptyForm: Omit<Student, "id"> = {
   birthDate: "",
   className: classes[0],
   level: levels[0],
-  status: "active",
   enrolledAt: new Date().toISOString().slice(0, 10),
   guardianName: "",
   guardianPhone: "",
@@ -157,7 +159,6 @@ const fullName = (s: Student) => `${s.firstName} ${s.lastName}`;
 
 export function StudentsPage() {
   const [items, setItems] = useState<Student[]>(seed);
-  const [status, setStatus] = useState<"all" | Status>("all");
   const [classFilter, setClassFilter] = useState<string>("all");
   const [levelFilter, setLevelFilter] = useState<string>("all");
   const [query, setQuery] = useState("");
@@ -170,15 +171,13 @@ export function StudentsPage() {
 
   const stats = useMemo(() => {
     const total = items.length;
-    const active = items.filter((s) => s.status === "active").length;
-    const suspended = items.filter((s) => s.status === "suspended").length;
     const att = total ? items.reduce((a, s) => a + s.attendance, 0) / total : 0;
-    return { total, active, suspended, att };
+    const avg = total ? items.reduce((a, s) => a + s.average, 0) / total : 0;
+    return { total, att, avg };
   }, [items]);
 
   const filtered = useMemo(() => {
     const list = items.filter((s) => {
-      if (status !== "all" && s.status !== status) return false;
       if (classFilter !== "all" && s.className !== classFilter) return false;
       if (levelFilter !== "all" && s.level !== levelFilter) return false;
       if (query) {
@@ -197,7 +196,7 @@ export function StudentsPage() {
       if (sortBy === "attendance") return b.attendance - a.attendance;
       return fullName(a).localeCompare(fullName(b));
     });
-  }, [items, status, classFilter, levelFilter, query, sortBy]);
+  }, [items, classFilter, levelFilter, query, sortBy]);
 
   function openCreate() {
     setEditing(null);
@@ -235,12 +234,12 @@ export function StudentsPage() {
   }
 
   function exportCsv() {
-    const header = ["Matricule", "Nom", "Classe", "Statut", "Assiduité", "Moyenne", "Scolarité"];
+    const header = ["Matricule", "Nom", "Classe", "Cycle", "Assiduité", "Moyenne", "Scolarité"];
     const rows = filtered.map((s) => [
       s.matricule,
       fullName(s),
       s.className,
-      statusLabels[s.status],
+      s.level,
       `${Math.round(s.attendance * 100)}%`,
       s.average.toFixed(1),
       s.feesPaid ? "Payée" : "En attente",
@@ -278,28 +277,19 @@ export function StudentsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <StatCard icon={Users2} label="Effectif total" value={String(stats.total)} />
-        <StatCard icon={UserCheck} label="Élèves actifs" value={String(stats.active)} />
-        <StatCard icon={UserX} label="Suspendus" value={String(stats.suspended)} />
         <StatCard
           icon={Percent}
           label="Assiduité moyenne"
           value={`${Math.round(stats.att * 100)}%`}
         />
+        <StatCard icon={UserCheck} label="Moyenne générale" value={`${stats.avg.toFixed(1)}/20`} />
       </div>
 
       {/* Filters */}
       <div className="card-elegant p-3 sm:p-4">
         <div className="flex flex-wrap items-center gap-3">
-          <Tabs value={status} onValueChange={(v) => setStatus(v as "all" | Status)}>
-            <TabsList>
-              <TabsTrigger value="all">Tous</TabsTrigger>
-              <TabsTrigger value="active">Actifs</TabsTrigger>
-              <TabsTrigger value="suspended">Suspendus</TabsTrigger>
-              <TabsTrigger value="graduated">Diplômés</TabsTrigger>
-            </TabsList>
-          </Tabs>
 
           <Select value={levelFilter} onValueChange={setLevelFilter}>
             <SelectTrigger className="h-9 w-[140px] text-xs">
@@ -364,7 +354,7 @@ export function StudentsPage() {
                 <TableHead className="text-[11px] uppercase tracking-[0.08em]">Assiduité</TableHead>
                 <TableHead className="text-[11px] uppercase tracking-[0.08em]">Moyenne</TableHead>
                 <TableHead className="text-[11px] uppercase tracking-[0.08em]">Scolarité</TableHead>
-                <TableHead className="text-[11px] uppercase tracking-[0.08em]">Statut</TableHead>
+                
                 <TableHead className="w-[130px] text-right text-[11px] uppercase tracking-[0.08em]">
                   Actions
                 </TableHead>
@@ -412,12 +402,6 @@ export function StudentsPage() {
                       {s.feesPaid ? "Payée" : "En attente"}
                     </span>
                   </TableCell>
-                  <TableCell>
-                    <span className="inline-flex items-center gap-1.5 text-xs font-medium">
-                      <span className={cn("h-1.5 w-1.5 rounded-full", statusDot[s.status])} />
-                      {statusLabels[s.status]}
-                    </span>
-                  </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1 opacity-60 transition-opacity group-hover:opacity-100">
                       <IconBtn label={`Voir ${fullName(s)}`} onClick={() => setDetail(s)}>
@@ -439,7 +423,7 @@ export function StudentsPage() {
               ))}
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={8} className="py-16 text-center">
+                  <TableCell colSpan={7} className="py-16 text-center">
                     <div className="mx-auto grid h-11 w-11 place-items-center rounded-xl bg-muted text-muted-foreground">
                       <GraduationCap className="h-5 w-5" />
                     </div>
@@ -566,21 +550,6 @@ export function StudentsPage() {
                     </SelectContent>
                   </Select>
                 </Field>
-                <Field label="Statut">
-                  <Select
-                    value={form.status}
-                    onValueChange={(v) => setForm((f) => ({ ...f, status: v as Status }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="active">Actif</SelectItem>
-                      <SelectItem value="suspended">Suspendu</SelectItem>
-                      <SelectItem value="graduated">Diplômé</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </Field>
                 <Field label="Assiduité (%)" id="att">
                   <Input
                     id="att"
@@ -703,7 +672,7 @@ export function StudentsPage() {
                 <div className="grid grid-cols-3 gap-3">
                   <MiniStat label="Assiduité" value={`${Math.round(detail.attendance * 100)}%`} />
                   <MiniStat label="Moyenne" value={`${detail.average.toFixed(1)}`} />
-                  <MiniStat label="Statut" value={statusLabels[detail.status]} />
+                  <MiniStat label="Scolarité" value={detail.feesPaid ? "Payée" : "En attente"} />
                 </div>
 
                 <div className="space-y-3">

@@ -56,7 +56,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 
-const LEVELS = ["Collège", "Lycée"];
+const LEVELS = ["Primaire", "Collège", "Lycée"];
 
 const TEACHERS = [
   "Nadia Belkacem",
