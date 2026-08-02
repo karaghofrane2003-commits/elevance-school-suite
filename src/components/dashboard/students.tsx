@@ -169,6 +169,7 @@ export function StudentsPage() {
   const [items, setItems] = useState<Student[]>(seed);
   const [classFilter, setClassFilter] = useState<string>("all");
   const [levelFilter, setLevelFilter] = useState<string>("all");
+  const [yearFilter, setYearFilter] = useState<string>("all");
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "average" | "attendance">("name");
   const [editing, setEditing] = useState<Student | null>(null);
@@ -181,13 +182,17 @@ export function StudentsPage() {
     const total = items.length;
     const att = total ? items.reduce((a, s) => a + s.attendance, 0) / total : 0;
     const avg = total ? items.reduce((a, s) => a + s.average, 0) / total : 0;
-    return { total, att, avg };
+    const newcomers = items.filter((s) => s.schoolYear === currentSchoolYear).length;
+    const absentToday = items.filter((s) => s.absentToday).length;
+    const pendingFees = items.filter((s) => !s.feesPaid).length;
+    return { total, att, avg, newcomers, absentToday, pendingFees };
   }, [items]);
 
   const filtered = useMemo(() => {
     const list = items.filter((s) => {
       if (classFilter !== "all" && s.className !== classFilter) return false;
       if (levelFilter !== "all" && s.level !== levelFilter) return false;
+      if (yearFilter !== "all" && s.schoolYear !== yearFilter) return false;
       if (query) {
         const q = query.toLowerCase();
         if (
@@ -204,7 +209,7 @@ export function StudentsPage() {
       if (sortBy === "attendance") return b.attendance - a.attendance;
       return fullName(a).localeCompare(fullName(b));
     });
-  }, [items, classFilter, levelFilter, query, sortBy]);
+  }, [items, classFilter, levelFilter, yearFilter, query, sortBy]);
 
   function openCreate() {
     setEditing(null);
