@@ -13,6 +13,9 @@ import {
   Download,
   Users2,
   UserCheck,
+  UserPlus,
+  UserX,
+  Wallet,
   Percent,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -76,6 +79,8 @@ type Student = {
   attendance: number;
   average: number;
   feesPaid: boolean;
+  absentToday: boolean;
+  schoolYear: string;
   notes: string;
 };
 
@@ -93,6 +98,8 @@ const classes = [
   "Terminale S",
 ];
 const levels = ["Primaire", "Collège", "Lycée"];
+const schoolYears = ["2025-2026", "2024-2025", "2023-2024"];
+const currentSchoolYear = schoolYears[0];
 
 const seed: Student[] = [
   ["Amina", "Bensalem", "6ème A", "Collège", 0.97, 15.8, true, "F"],
@@ -124,6 +131,7 @@ const seed: Student[] = [
     className,
     level,
     enrolledAt: `202${3 + (i % 3)}-09-01`,
+    schoolYear: `202${3 + (i % 3)}-202${4 + (i % 3)}`,
     guardianName: `M./Mme ${lastName}`,
     guardianPhone: `+33 6 12 34 5${i} ${10 + i}`,
     guardianEmail: `${firstName.toLowerCase()}.${lastName.toLowerCase().replace(/[^a-z]/g, "")}@famille.fr`,
@@ -131,6 +139,7 @@ const seed: Student[] = [
     attendance,
     average,
     feesPaid,
+    absentToday: i % 4 === 2,
     notes: "",
   } satisfies Student;
 });
@@ -151,6 +160,8 @@ const emptyForm: Omit<Student, "id"> = {
   attendance: 1,
   average: 0,
   feesPaid: false,
+  absentToday: false,
+  schoolYear: currentSchoolYear,
   notes: "",
 };
 
@@ -161,6 +172,7 @@ export function StudentsPage() {
   const [items, setItems] = useState<Student[]>(seed);
   const [classFilter, setClassFilter] = useState<string>("all");
   const [levelFilter, setLevelFilter] = useState<string>("all");
+  const [yearFilter, setYearFilter] = useState<string>("all");
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "average" | "attendance">("name");
   const [editing, setEditing] = useState<Student | null>(null);
@@ -173,13 +185,17 @@ export function StudentsPage() {
     const total = items.length;
     const att = total ? items.reduce((a, s) => a + s.attendance, 0) / total : 0;
     const avg = total ? items.reduce((a, s) => a + s.average, 0) / total : 0;
-    return { total, att, avg };
+    const newcomers = items.filter((s) => s.schoolYear === currentSchoolYear).length;
+    const absentToday = items.filter((s) => s.absentToday).length;
+    const pendingFees = items.filter((s) => !s.feesPaid).length;
+    return { total, att, avg, newcomers, absentToday, pendingFees };
   }, [items]);
 
   const filtered = useMemo(() => {
     const list = items.filter((s) => {
       if (classFilter !== "all" && s.className !== classFilter) return false;
       if (levelFilter !== "all" && s.level !== levelFilter) return false;
+      if (yearFilter !== "all" && s.schoolYear !== yearFilter) return false;
       if (query) {
         const q = query.toLowerCase();
         if (
@@ -196,7 +212,7 @@ export function StudentsPage() {
       if (sortBy === "attendance") return b.attendance - a.attendance;
       return fullName(a).localeCompare(fullName(b));
     });
-  }, [items, classFilter, levelFilter, query, sortBy]);
+  }, [items, classFilter, levelFilter, yearFilter, query, sortBy]);
 
   function openCreate() {
     setEditing(null);
@@ -278,7 +294,10 @@ export function StudentsPage() {
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <StatCard icon={Users2} label="Effectif total" value={String(stats.total)} />
+        <StatCard icon={Users2} label="Total élèves" value={String(stats.total)} />
+        <StatCard icon={UserPlus} label="Nouveaux inscrits" value={String(stats.newcomers)} />
+        <StatCard icon={UserX} label="Absents aujourd'hui" value={String(stats.absentToday)} />
+        <StatCard icon={Wallet} label="Paiements en attente" value={String(stats.pendingFees)} />
         <StatCard
           icon={Percent}
           label="Assiduité moyenne"
@@ -290,6 +309,20 @@ export function StudentsPage() {
       {/* Filters */}
       <div className="card-elegant p-3 sm:p-4">
         <div className="flex flex-wrap items-center gap-3">
+          <Select value={yearFilter} onValueChange={setYearFilter}>
+            <SelectTrigger className="h-9 w-[170px] text-xs">
+              <SelectValue placeholder="Année scolaire" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Toutes les années</SelectItem>
+              {schoolYears.map((y) => (
+                <SelectItem key={y} value={y}>
+                  Année {y}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
 
           <Select value={levelFilter} onValueChange={setLevelFilter}>
             <SelectTrigger className="h-9 w-[140px] text-xs">
