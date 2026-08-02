@@ -291,7 +291,10 @@ export function StudentsPage() {
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <StatCard icon={Users2} label="Effectif total" value={String(stats.total)} />
+        <StatCard icon={Users2} label="Total élèves" value={String(stats.total)} />
+        <StatCard icon={UserPlus} label="Nouveaux inscrits" value={String(stats.newcomers)} />
+        <StatCard icon={UserX} label="Absents aujourd'hui" value={String(stats.absentToday)} />
+        <StatCard icon={Wallet} label="Paiements en attente" value={String(stats.pendingFees)} />
         <StatCard
           icon={Percent}
           label="Assiduité moyenne"
@@ -303,6 +306,20 @@ export function StudentsPage() {
       {/* Filters */}
       <div className="card-elegant p-3 sm:p-4">
         <div className="flex flex-wrap items-center gap-3">
+          <Select value={yearFilter} onValueChange={setYearFilter}>
+            <SelectTrigger className="h-9 w-[170px] text-xs">
+              <SelectValue placeholder="Année scolaire" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Toutes les années</SelectItem>
+              {schoolYears.map((y) => (
+                <SelectItem key={y} value={y}>
+                  Année {y}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
 
           <Select value={levelFilter} onValueChange={setLevelFilter}>
             <SelectTrigger className="h-9 w-[140px] text-xs">
