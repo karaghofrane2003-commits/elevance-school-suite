@@ -157,6 +157,8 @@ const emptyForm: Omit<Student, "id"> = {
   attendance: 1,
   average: 0,
   feesPaid: false,
+  absentToday: false,
+  schoolYear: currentSchoolYear,
   notes: "",
 };
 
