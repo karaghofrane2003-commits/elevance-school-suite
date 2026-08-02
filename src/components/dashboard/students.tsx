@@ -13,6 +13,9 @@ import {
   Download,
   Users2,
   UserCheck,
+  UserPlus,
+  UserX,
+  Wallet,
   Percent,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
