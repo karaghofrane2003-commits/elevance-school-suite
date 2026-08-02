@@ -128,6 +128,7 @@ const seed: Student[] = [
     className,
     level,
     enrolledAt: `202${3 + (i % 3)}-09-01`,
+    schoolYear: `202${3 + (i % 3)}-202${4 + (i % 3)}`,
     guardianName: `M./Mme ${lastName}`,
     guardianPhone: `+33 6 12 34 5${i} ${10 + i}`,
     guardianEmail: `${firstName.toLowerCase()}.${lastName.toLowerCase().replace(/[^a-z]/g, "")}@famille.fr`,
@@ -135,6 +136,7 @@ const seed: Student[] = [
     attendance,
     average,
     feesPaid,
+    absentToday: i % 4 === 2,
     notes: "",
   } satisfies Student;
 });
