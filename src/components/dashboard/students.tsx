@@ -13,7 +13,6 @@ import {
   Download,
   Users2,
   UserCheck,
-  UserX,
   Percent,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -56,7 +55,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 
 type Gender = "F" | "M";
