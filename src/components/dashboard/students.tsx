@@ -20,6 +20,9 @@ import {
   RotateCcw,
   ChevronLeft,
   ChevronRight,
+  LayoutGrid,
+  List,
+
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -195,6 +198,8 @@ export function StudentsPage() {
   const [levelFilter, setLevelFilter] = useState<string>("all");
   const [yearFilter, setYearFilter] = useState<string>(currentSchoolYear);
   const [page, setPage] = useState(1);
+  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "average" | "attendance">("name");
   const [editing, setEditing] = useState<Student | null>(null);
@@ -426,7 +431,6 @@ export function StudentsPage() {
           <Button
             variant="ghost"
             onClick={resetFilters}
-            disabled={!filtersActive}
             className="h-9 gap-2 px-3 text-xs"
           >
             <RotateCcw className="h-3.5 w-3.5" /> Réinitialiser
@@ -445,8 +449,40 @@ export function StudentsPage() {
             />
           </div>
 
+          <div className="flex items-center gap-1 rounded-xl border border-border bg-muted/40 p-1">
+            <button
+              type="button"
+              aria-label="Vue liste"
+              aria-pressed={viewMode === "list"}
+              onClick={() => setViewMode("list")}
+              className={cn(
+                "grid h-7 w-8 place-items-center rounded-lg transition-colors",
+                viewMode === "list"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <List className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              aria-label="Vue grille"
+              aria-pressed={viewMode === "grid"}
+              onClick={() => setViewMode("grid")}
+              className={cn(
+                "grid h-7 w-8 place-items-center rounded-lg transition-colors",
+                viewMode === "grid"
+                  ? "bg-background text-primary shadow-sm"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </button>
+          </div>
+
         </div>
       </div>
+
 
       {/* Table */}
       <div className="card-elegant overflow-hidden">
