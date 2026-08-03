@@ -190,7 +190,8 @@ export function StudentsPage() {
   const [items, setItems] = useState<Student[]>(seed);
   const [classFilter, setClassFilter] = useState<string>("all");
   const [levelFilter, setLevelFilter] = useState<string>("all");
-  const [yearFilter, setYearFilter] = useState<string>("all");
+  const [yearFilter, setYearFilter] = useState<string>(currentSchoolYear);
+  const [page, setPage] = useState(1);
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "average" | "attendance">("name");
   const [editing, setEditing] = useState<Student | null>(null);
