@@ -233,6 +233,27 @@ export function StudentsPage() {
     });
   }, [items, classFilter, levelFilter, yearFilter, query, sortBy]);
 
+  const pageSize = 10;
+  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const currentPage = Math.min(page, pageCount);
+  const paginated = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const filtersActive =
+    yearFilter !== currentSchoolYear ||
+    levelFilter !== "all" ||
+    classFilter !== "all" ||
+    sortBy !== "name" ||
+    query !== "";
+
+  function resetFilters() {
+    setYearFilter(currentSchoolYear);
+    setLevelFilter("all");
+    setClassFilter("all");
+    setSortBy("name");
+    setQuery("");
+    setPage(1);
+  }
+
+
   function openCreate() {
     setEditing(null);
     setForm({ ...emptyForm, matricule: `ELV-2026-${String(items.length + 1).padStart(3, "0")}` });
