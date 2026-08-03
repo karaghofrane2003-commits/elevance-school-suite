@@ -17,6 +17,9 @@ import {
   UserX,
   Wallet,
   Percent,
+  RotateCcw,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -110,6 +113,24 @@ const seed: Student[] = [
   ["Youssef", "Haddad", "Terminale S", "Lycée", 0.99, 17.4, true, "M"],
   ["Camille", "Durand", "CP A", "Primaire", 0.83, 12.1, true, "F"],
   ["Adam", "Lefèvre", "6ème B", "Collège", 0.93, 14.0, false, "M"],
+  ["Léa", "Fontaine", "CE1 A", "Primaire", 0.96, 15.1, true, "F"],
+  ["Rayan", "Ziani", "CM1 A", "Primaire", 0.89, 12.8, false, "M"],
+  ["Chloé", "Marchand", "5ème B", "Collège", 0.92, 16.2, true, "F"],
+  ["Ismaël", "Traoré", "4ème A", "Collège", 0.78, 11.6, false, "M"],
+  ["Manon", "Girard", "3ème A", "Collège", 0.94, 14.9, true, "F"],
+  ["Elias", "Nadir", "2nde C", "Lycée", 0.85, 13.4, true, "M"],
+  ["Jade", "Rousseau", "1ère S", "Lycée", 0.9, 15.5, false, "F"],
+  ["Mehdi", "Ouali", "Terminale S", "Lycée", 0.98, 17.9, true, "M"],
+  ["Nina", "Perrot", "CP A", "Primaire", 0.87, 13.0, true, "F"],
+  ["Gabriel", "Faure", "CE1 A", "Primaire", 0.91, 14.2, false, "M"],
+  ["Sarah", "Belhadj", "6ème B", "Collège", 0.95, 16.4, true, "F"],
+  ["Tom", "Leroy", "4ème A", "Collège", 0.8, 12.3, false, "M"],
+  ["Yasmine", "Kaci", "3ème A", "Collège", 0.93, 15.7, true, "F"],
+  ["Hugo", "Barbier", "2nde C", "Lycée", 0.76, 10.9, false, "M"],
+  ["Lina", "Amrani", "1ère S", "Lycée", 0.97, 18.1, true, "F"],
+  ["Nathan", "Colin", "Terminale S", "Lycée", 0.88, 13.8, true, "M"],
+  ["Éva", "Mercier", "CM2 B", "Primaire", 0.92, 14.5, false, "F"],
+  ["Samir", "Boukhari", "CM1 A", "Primaire", 0.94, 15.3, true, "M"],
 ].map((row, i) => {
   const [firstName, lastName, className, level, attendance, average, feesPaid, gender] = row as [
     string,
@@ -130,8 +151,8 @@ const seed: Student[] = [
     birthDate: `20${10 + (i % 5)}-0${(i % 9) + 1}-1${i % 9}`,
     className,
     level,
-    enrolledAt: `202${3 + (i % 3)}-09-01`,
-    schoolYear: `202${3 + (i % 3)}-202${4 + (i % 3)}`,
+    enrolledAt: `${schoolYears[i % 7 === 3 ? 1 : i % 11 === 5 ? 2 : 0].slice(0, 4)}-09-01`,
+    schoolYear: schoolYears[i % 7 === 3 ? 1 : i % 11 === 5 ? 2 : 0],
     guardianName: `M./Mme ${lastName}`,
     guardianPhone: `+33 6 12 34 5${i} ${10 + i}`,
     guardianEmail: `${firstName.toLowerCase()}.${lastName.toLowerCase().replace(/[^a-z]/g, "")}@famille.fr`,
@@ -172,7 +193,8 @@ export function StudentsPage() {
   const [items, setItems] = useState<Student[]>(seed);
   const [classFilter, setClassFilter] = useState<string>("all");
   const [levelFilter, setLevelFilter] = useState<string>("all");
-  const [yearFilter, setYearFilter] = useState<string>("all");
+  const [yearFilter, setYearFilter] = useState<string>(currentSchoolYear);
+  const [page, setPage] = useState(1);
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "average" | "attendance">("name");
   const [editing, setEditing] = useState<Student | null>(null);
@@ -213,6 +235,27 @@ export function StudentsPage() {
       return fullName(a).localeCompare(fullName(b));
     });
   }, [items, classFilter, levelFilter, yearFilter, query, sortBy]);
+
+  const pageSize = 10;
+  const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const currentPage = Math.min(page, pageCount);
+  const paginated = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const filtersActive =
+    yearFilter !== currentSchoolYear ||
+    levelFilter !== "all" ||
+    classFilter !== "all" ||
+    sortBy !== "name" ||
+    query !== "";
+
+  function resetFilters() {
+    setYearFilter(currentSchoolYear);
+    setLevelFilter("all");
+    setClassFilter("all");
+    setSortBy("name");
+    setQuery("");
+    setPage(1);
+  }
+
 
   function openCreate() {
     setEditing(null);
@@ -309,7 +352,13 @@ export function StudentsPage() {
       {/* Filters */}
       <div className="card-elegant p-3 sm:p-4">
         <div className="flex flex-wrap items-center gap-3">
-          <Select value={yearFilter} onValueChange={setYearFilter}>
+          <Select
+            value={yearFilter}
+            onValueChange={(v) => {
+              setYearFilter(v);
+              setPage(1);
+            }}
+          >
             <SelectTrigger className="h-9 w-[170px] text-xs">
               <SelectValue placeholder="Année scolaire" />
             </SelectTrigger>
@@ -323,8 +372,13 @@ export function StudentsPage() {
             </SelectContent>
           </Select>
 
-
-          <Select value={levelFilter} onValueChange={setLevelFilter}>
+          <Select
+            value={levelFilter}
+            onValueChange={(v) => {
+              setLevelFilter(v);
+              setPage(1);
+            }}
+          >
             <SelectTrigger className="h-9 w-[140px] text-xs">
               <SelectValue placeholder="Cycle" />
             </SelectTrigger>
@@ -338,7 +392,13 @@ export function StudentsPage() {
             </SelectContent>
           </Select>
 
-          <Select value={classFilter} onValueChange={setClassFilter}>
+          <Select
+            value={classFilter}
+            onValueChange={(v) => {
+              setClassFilter(v);
+              setPage(1);
+            }}
+          >
             <SelectTrigger className="h-9 w-[150px] text-xs">
               <SelectValue placeholder="Classe" />
             </SelectTrigger>
@@ -363,15 +423,28 @@ export function StudentsPage() {
             </SelectContent>
           </Select>
 
+          <Button
+            variant="ghost"
+            onClick={resetFilters}
+            disabled={!filtersActive}
+            className="h-9 gap-2 px-3 text-xs"
+          >
+            <RotateCcw className="h-3.5 w-3.5" /> Réinitialiser
+          </Button>
+
           <div className="relative ml-auto w-full sm:w-[260px]">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setPage(1);
+              }}
               placeholder="Nom, matricule, responsable…"
               className="h-9 pl-9 text-xs"
             />
           </div>
+
         </div>
       </div>
 
@@ -394,7 +467,7 @@ export function StudentsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((s) => (
+              {paginated.map((s) => (
                 <TableRow key={s.id} className="group">
                   <TableCell className="py-3">
                     <div className="flex items-center gap-3">
@@ -470,12 +543,49 @@ export function StudentsPage() {
             </TableBody>
           </Table>
         </div>
-        <div className="flex items-center justify-between border-t border-border px-4 py-3 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3 text-xs text-muted-foreground">
           <span>
-            {filtered.length} élève{filtered.length > 1 ? "s" : ""} affiché
-            {filtered.length > 1 ? "s" : ""} sur {items.length}
+            Affichage de <strong className="text-foreground">{paginated.length}</strong> sur{" "}
+            <strong className="text-foreground">{filtered.length}</strong> élève
+            {filtered.length > 1 ? "s" : ""}
           </span>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              aria-label="Page précédente"
+              disabled={currentPage <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            {Array.from({ length: pageCount }, (_, i) => i + 1).map((p) => (
+              <Button
+                key={p}
+                variant={p === currentPage ? "default" : "ghost"}
+                size="icon"
+                className="h-8 w-8 text-xs"
+                aria-label={`Page ${p}`}
+                aria-current={p === currentPage ? "page" : undefined}
+                onClick={() => setPage(p)}
+              >
+                {p}
+              </Button>
+            ))}
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              aria-label="Page suivante"
+              disabled={currentPage >= pageCount}
+              onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
+
       </div>
 
       {/* Editor */}
