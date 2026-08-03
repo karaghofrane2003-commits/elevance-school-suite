@@ -20,6 +20,9 @@ import {
   RotateCcw,
   ChevronLeft,
   ChevronRight,
+  LayoutGrid,
+  List,
+
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -195,6 +198,8 @@ export function StudentsPage() {
   const [levelFilter, setLevelFilter] = useState<string>("all");
   const [yearFilter, setYearFilter] = useState<string>(currentSchoolYear);
   const [page, setPage] = useState(1);
+  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "average" | "attendance">("name");
   const [editing, setEditing] = useState<Student | null>(null);
@@ -240,12 +245,6 @@ export function StudentsPage() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
   const currentPage = Math.min(page, pageCount);
   const paginated = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-  const filtersActive =
-    yearFilter !== currentSchoolYear ||
-    levelFilter !== "all" ||
-    classFilter !== "all" ||
-    sortBy !== "name" ||
-    query !== "";
 
   function resetFilters() {
     setYearFilter(currentSchoolYear);
@@ -426,7 +425,6 @@ export function StudentsPage() {
           <Button
             variant="ghost"
             onClick={resetFilters}
-            disabled={!filtersActive}
             className="h-9 gap-2 px-3 text-xs"
           >
             <RotateCcw className="h-3.5 w-3.5" /> Réinitialiser
@@ -445,12 +443,46 @@ export function StudentsPage() {
             />
           </div>
 
+          <div className="flex items-center gap-1 rounded-xl border border-border bg-muted/40 p-1">
+            <button
+              type="button"
+              aria-label="Vue liste"
+              aria-pressed={viewMode === "list"}
+              onClick={() => setViewMode("list")}
+              className={cn(
+                "grid h-7 w-8 place-items-center rounded-lg transition-colors",
+                viewMode === "list"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <List className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              aria-label="Vue grille"
+              aria-pressed={viewMode === "grid"}
+              onClick={() => setViewMode("grid")}
+              className={cn(
+                "grid h-7 w-8 place-items-center rounded-lg transition-colors",
+                viewMode === "grid"
+                  ? "bg-background text-primary shadow-sm"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </button>
+          </div>
+
         </div>
       </div>
 
+
       {/* Table */}
       <div className="card-elegant overflow-hidden">
+        {viewMode === "list" ? (
         <div className="overflow-x-auto">
+
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
@@ -543,6 +575,73 @@ export function StudentsPage() {
             </TableBody>
           </Table>
         </div>
+        ) : (
+          <div className="grid gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3">
+            {paginated.map((s) => (
+              <div key={s.id} className="card-hover rounded-2xl border border-border bg-background p-4">
+                <div className="flex items-start gap-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarFallback className="bg-muted text-[11px] font-semibold text-muted-foreground">
+                      {initials(s)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-semibold leading-tight">{fullName(s)}</div>
+                    <div className="text-[11px] text-muted-foreground">
+                      {s.matricule} · {s.className}
+                    </div>
+                  </div>
+                  <span
+                    className={cn(
+                      "inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-semibold",
+                      s.feesPaid
+                        ? "border-border bg-muted/60 text-muted-foreground"
+                        : "border-[color-mix(in_oklab,var(--warning)_35%,transparent)] bg-[color-mix(in_oklab,var(--warning)_10%,transparent)] text-[var(--warning)]",
+                    )}
+                  >
+                    {s.feesPaid ? "Payée" : "En attente"}
+                  </span>
+                </div>
+                <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <div className="text-[10px] uppercase tracking-[0.08em] text-muted-foreground">Assiduité</div>
+                    <div className="font-semibold tabular-nums">{Math.round(s.attendance * 100)}%</div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] uppercase tracking-[0.08em] text-muted-foreground">Moyenne</div>
+                    <div className="font-semibold tabular-nums">{s.average.toFixed(1)}/20</div>
+                  </div>
+                </div>
+                <div className="mt-3 border-t border-border pt-3 text-[11px] text-muted-foreground">
+                  {s.guardianName} · {s.guardianPhone}
+                </div>
+                <div className="mt-3 flex justify-end gap-1">
+                  <IconBtn label={`Voir ${fullName(s)}`} onClick={() => setDetail(s)}>
+                    <Eye className="h-4 w-4" />
+                  </IconBtn>
+                  <IconBtn label={`Modifier ${fullName(s)}`} onClick={() => openEdit(s)}>
+                    <Pencil className="h-4 w-4" />
+                  </IconBtn>
+                  <IconBtn label={`Supprimer ${fullName(s)}`} danger onClick={() => setToDelete(s)}>
+                    <Trash2 className="h-4 w-4" />
+                  </IconBtn>
+                </div>
+              </div>
+            ))}
+            {filtered.length === 0 && (
+              <div className="col-span-full py-16 text-center">
+                <div className="mx-auto grid h-11 w-11 place-items-center rounded-xl bg-muted text-muted-foreground">
+                  <GraduationCap className="h-5 w-5" />
+                </div>
+                <div className="mt-3 text-sm font-semibold">Aucun élève</div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Ajustez vos filtres ou inscrivez un nouvel élève.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3 text-xs text-muted-foreground">
           <span>
             Affichage de <strong className="text-foreground">{paginated.length}</strong> sur{" "}
