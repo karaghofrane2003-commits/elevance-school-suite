@@ -467,7 +467,7 @@ export function StudentsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((s) => (
+              {paginated.map((s) => (
                 <TableRow key={s.id} className="group">
                   <TableCell className="py-3">
                     <div className="flex items-center gap-3">
