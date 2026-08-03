@@ -540,12 +540,49 @@ export function StudentsPage() {
             </TableBody>
           </Table>
         </div>
-        <div className="flex items-center justify-between border-t border-border px-4 py-3 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3 text-xs text-muted-foreground">
           <span>
-            {filtered.length} élève{filtered.length > 1 ? "s" : ""} affiché
-            {filtered.length > 1 ? "s" : ""} sur {items.length}
+            Affichage de <strong className="text-foreground">{paginated.length}</strong> sur{" "}
+            <strong className="text-foreground">{filtered.length}</strong> élève
+            {filtered.length > 1 ? "s" : ""}
           </span>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              aria-label="Page précédente"
+              disabled={currentPage <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            {Array.from({ length: pageCount }, (_, i) => i + 1).map((p) => (
+              <Button
+                key={p}
+                variant={p === currentPage ? "default" : "ghost"}
+                size="icon"
+                className="h-8 w-8 text-xs"
+                aria-label={`Page ${p}`}
+                aria-current={p === currentPage ? "page" : undefined}
+                onClick={() => setPage(p)}
+              >
+                {p}
+              </Button>
+            ))}
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              aria-label="Page suivante"
+              disabled={currentPage >= pageCount}
+              onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
+
       </div>
 
       {/* Editor */}
