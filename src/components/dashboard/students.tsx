@@ -349,7 +349,13 @@ export function StudentsPage() {
       {/* Filters */}
       <div className="card-elegant p-3 sm:p-4">
         <div className="flex flex-wrap items-center gap-3">
-          <Select value={yearFilter} onValueChange={setYearFilter}>
+          <Select
+            value={yearFilter}
+            onValueChange={(v) => {
+              setYearFilter(v);
+              setPage(1);
+            }}
+          >
             <SelectTrigger className="h-9 w-[170px] text-xs">
               <SelectValue placeholder="Année scolaire" />
             </SelectTrigger>
@@ -363,8 +369,13 @@ export function StudentsPage() {
             </SelectContent>
           </Select>
 
-
-          <Select value={levelFilter} onValueChange={setLevelFilter}>
+          <Select
+            value={levelFilter}
+            onValueChange={(v) => {
+              setLevelFilter(v);
+              setPage(1);
+            }}
+          >
             <SelectTrigger className="h-9 w-[140px] text-xs">
               <SelectValue placeholder="Cycle" />
             </SelectTrigger>
@@ -378,7 +389,13 @@ export function StudentsPage() {
             </SelectContent>
           </Select>
 
-          <Select value={classFilter} onValueChange={setClassFilter}>
+          <Select
+            value={classFilter}
+            onValueChange={(v) => {
+              setClassFilter(v);
+              setPage(1);
+            }}
+          >
             <SelectTrigger className="h-9 w-[150px] text-xs">
               <SelectValue placeholder="Classe" />
             </SelectTrigger>
@@ -403,15 +420,28 @@ export function StudentsPage() {
             </SelectContent>
           </Select>
 
+          <Button
+            variant="ghost"
+            onClick={resetFilters}
+            disabled={!filtersActive}
+            className="h-9 gap-2 px-3 text-xs"
+          >
+            <RotateCcw className="h-3.5 w-3.5" /> Réinitialiser
+          </Button>
+
           <div className="relative ml-auto w-full sm:w-[260px]">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setPage(1);
+              }}
               placeholder="Nom, matricule, responsable…"
               className="h-9 pl-9 text-xs"
             />
           </div>
+
         </div>
       </div>
 
