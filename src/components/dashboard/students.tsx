@@ -245,12 +245,6 @@ export function StudentsPage() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
   const currentPage = Math.min(page, pageCount);
   const paginated = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-  const filtersActive =
-    yearFilter !== currentSchoolYear ||
-    levelFilter !== "all" ||
-    classFilter !== "all" ||
-    sortBy !== "name" ||
-    query !== "";
 
   function resetFilters() {
     setYearFilter(currentSchoolYear);
@@ -486,7 +480,9 @@ export function StudentsPage() {
 
       {/* Table */}
       <div className="card-elegant overflow-hidden">
+        {viewMode === "list" ? (
         <div className="overflow-x-auto">
+
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
