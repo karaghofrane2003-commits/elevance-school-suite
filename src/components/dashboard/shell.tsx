@@ -342,12 +342,8 @@ function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
           Nouveau
         </Button>
 
-        <IconAction badge="5">
-          <MessageCircle className="h-[18px] w-[18px]" />
-        </IconAction>
-        <IconAction badge="3" pulse>
-          <Bell className="h-[18px] w-[18px]" />
-        </IconAction>
+        <MessagesMenu />
+        <NotificationsMenu />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
