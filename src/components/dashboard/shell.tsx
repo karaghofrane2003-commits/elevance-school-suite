@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
+
 import {
   Bell,
   ChevronDown,
@@ -38,6 +39,17 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 
 type NavItem = { label: string; icon: typeof LayoutDashboard; badge?: string; active?: boolean; to?: string };
 
@@ -102,7 +114,9 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 }
 
 function SidebarContent({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
+  const [logoutOpen, setLogoutOpen] = useState(false);
   return (
+
     <>
       {/* Logo */}
       <div
@@ -153,33 +167,42 @@ function SidebarContent({ collapsed, onToggle }: { collapsed: boolean; onToggle:
       <div className="border-t border-sidebar-border p-3">
         <div
           className={cn(
-            "flex items-center gap-3 rounded-xl p-2 hover:bg-sidebar-accent transition-colors cursor-pointer",
+            "flex items-center gap-3 rounded-xl p-2 hover:bg-sidebar-accent transition-colors",
             collapsed && "justify-center",
           )}
         >
-          <Avatar className="h-9 w-9 shrink-0 ring-2 ring-background">
-            <AvatarFallback className="bg-gradient-to-br from-primary to-[oklch(0.674_0.176_250)] text-primary-foreground text-xs font-semibold">
-              MD
-            </AvatarFallback>
-          </Avatar>
-          {!collapsed && (
-            <>
+          <Link
+            to="/profil"
+            className="flex min-w-0 flex-1 items-center gap-3"
+            title="Mon profil"
+          >
+            <Avatar className="h-9 w-9 shrink-0 ring-2 ring-background">
+              <AvatarFallback className="bg-gradient-to-br from-primary to-[oklch(0.674_0.176_250)] text-primary-foreground text-xs font-semibold">
+                MD
+              </AvatarFallback>
+            </Avatar>
+            {!collapsed && (
               <div className="min-w-0 flex-1">
                 <div className="text-sm font-semibold truncate">Marie Dubois</div>
                 <div className="text-[11px] text-muted-foreground truncate">Directrice</div>
               </div>
-              <button
-                className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-background hover:text-foreground transition-colors"
-                aria-label="Se déconnecter"
-              >
-                <LogOut className="h-4 w-4" />
-              </button>
-            </>
+            )}
+          </Link>
+          {!collapsed && (
+            <button
+              onClick={() => setLogoutOpen(true)}
+              className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-background hover:text-foreground transition-colors"
+              aria-label="Se déconnecter"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
           )}
         </div>
       </div>
+      <LogoutDialog open={logoutOpen} onOpenChange={setLogoutOpen} />
     </>
   );
+
 }
 
 function NavGroup({
@@ -256,7 +279,9 @@ function NavGroup({
 }
 
 function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
+  const [logoutOpen, setLogoutOpen] = useState(false);
   return (
+
     <header className="sticky top-0 z-30 h-[68px] border-b border-border bg-background/80 backdrop-blur-xl">
       <div className="flex h-full items-center gap-3 px-4 sm:px-6 lg:px-8">
         <button
@@ -343,17 +368,65 @@ function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Mon profil</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/profil">Mon profil</Link>
+            </DropdownMenuItem>
             <DropdownMenuItem>Paramètres</DropdownMenuItem>
-            <DropdownMenuItem>Aide & support</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/aide">Aide &amp; support</Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">Se déconnecter</DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-destructive"
+              onSelect={(e) => {
+                e.preventDefault();
+                setLogoutOpen(true);
+              }}
+            >
+              Se déconnecter
+            </DropdownMenuItem>
+
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <LogoutDialog open={logoutOpen} onOpenChange={setLogoutOpen} />
       </div>
     </header>
   );
 }
+
+function LogoutDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+}) {
+  const navigate = useNavigate();
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Se déconnecter ?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Vous serez redirigé vers la page de connexion. Les modifications non enregistrées
+            seront perdues.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Annuler</AlertDialogCancel>
+          <AlertDialogAction
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            onClick={() => navigate({ to: "/connexion" })}
+          >
+            Se déconnecter
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
 
 function IconAction({
   children,
