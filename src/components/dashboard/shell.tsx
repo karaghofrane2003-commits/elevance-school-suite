@@ -114,7 +114,9 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 }
 
 function SidebarContent({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) {
+  const [logoutOpen, setLogoutOpen] = useState(false);
   return (
+
     <>
       {/* Logo */}
       <div
