@@ -9,12 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProfilRouteImport } from './routes/profil'
 import { Route as ProfesseursRouteImport } from './routes/professeurs'
 import { Route as ElevesRouteImport } from './routes/eleves'
+import { Route as ConnexionRouteImport } from './routes/connexion'
 import { Route as ClassesRouteImport } from './routes/classes'
 import { Route as AnnoncesRouteImport } from './routes/annonces'
+import { Route as AideRouteImport } from './routes/aide'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ProfilRoute = ProfilRouteImport.update({
+  id: '/profil',
+  path: '/profil',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfesseursRoute = ProfesseursRouteImport.update({
   id: '/professeurs',
   path: '/professeurs',
@@ -23,6 +31,11 @@ const ProfesseursRoute = ProfesseursRouteImport.update({
 const ElevesRoute = ElevesRouteImport.update({
   id: '/eleves',
   path: '/eleves',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConnexionRoute = ConnexionRouteImport.update({
+  id: '/connexion',
+  path: '/connexion',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClassesRoute = ClassesRouteImport.update({
@@ -35,6 +48,11 @@ const AnnoncesRoute = AnnoncesRouteImport.update({
   path: '/annonces',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AideRoute = AideRouteImport.update({
+  id: '/aide',
+  path: '/aide',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -43,44 +61,88 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/aide': typeof AideRoute
   '/annonces': typeof AnnoncesRoute
   '/classes': typeof ClassesRoute
+  '/connexion': typeof ConnexionRoute
   '/eleves': typeof ElevesRoute
   '/professeurs': typeof ProfesseursRoute
+  '/profil': typeof ProfilRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/aide': typeof AideRoute
   '/annonces': typeof AnnoncesRoute
   '/classes': typeof ClassesRoute
+  '/connexion': typeof ConnexionRoute
   '/eleves': typeof ElevesRoute
   '/professeurs': typeof ProfesseursRoute
+  '/profil': typeof ProfilRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/aide': typeof AideRoute
   '/annonces': typeof AnnoncesRoute
   '/classes': typeof ClassesRoute
+  '/connexion': typeof ConnexionRoute
   '/eleves': typeof ElevesRoute
   '/professeurs': typeof ProfesseursRoute
+  '/profil': typeof ProfilRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/annonces' | '/classes' | '/eleves' | '/professeurs'
+  fullPaths:
+    | '/'
+    | '/aide'
+    | '/annonces'
+    | '/classes'
+    | '/connexion'
+    | '/eleves'
+    | '/professeurs'
+    | '/profil'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/annonces' | '/classes' | '/eleves' | '/professeurs'
-  id: '__root__' | '/' | '/annonces' | '/classes' | '/eleves' | '/professeurs'
+  to:
+    | '/'
+    | '/aide'
+    | '/annonces'
+    | '/classes'
+    | '/connexion'
+    | '/eleves'
+    | '/professeurs'
+    | '/profil'
+  id:
+    | '__root__'
+    | '/'
+    | '/aide'
+    | '/annonces'
+    | '/classes'
+    | '/connexion'
+    | '/eleves'
+    | '/professeurs'
+    | '/profil'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AideRoute: typeof AideRoute
   AnnoncesRoute: typeof AnnoncesRoute
   ClassesRoute: typeof ClassesRoute
+  ConnexionRoute: typeof ConnexionRoute
   ElevesRoute: typeof ElevesRoute
   ProfesseursRoute: typeof ProfesseursRoute
+  ProfilRoute: typeof ProfilRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/profil': {
+      id: '/profil'
+      path: '/profil'
+      fullPath: '/profil'
+      preLoaderRoute: typeof ProfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/professeurs': {
       id: '/professeurs'
       path: '/professeurs'
@@ -93,6 +155,13 @@ declare module '@tanstack/react-router' {
       path: '/eleves'
       fullPath: '/eleves'
       preLoaderRoute: typeof ElevesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/connexion': {
+      id: '/connexion'
+      path: '/connexion'
+      fullPath: '/connexion'
+      preLoaderRoute: typeof ConnexionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/classes': {
@@ -109,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AnnoncesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/aide': {
+      id: '/aide'
+      path: '/aide'
+      fullPath: '/aide'
+      preLoaderRoute: typeof AideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -121,10 +197,13 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AideRoute: AideRoute,
   AnnoncesRoute: AnnoncesRoute,
   ClassesRoute: ClassesRoute,
+  ConnexionRoute: ConnexionRoute,
   ElevesRoute: ElevesRoute,
   ProfesseursRoute: ProfesseursRoute,
+  ProfilRoute: ProfilRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
