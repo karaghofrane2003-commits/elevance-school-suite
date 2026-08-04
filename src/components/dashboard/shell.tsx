@@ -424,34 +424,6 @@ function LogoutDialog({
 }
 
 
-function IconAction({
-  children,
-  badge,
-  pulse,
-}: {
-  children: ReactNode;
-  badge?: string;
-  pulse?: boolean;
-}) {
-  return (
-    <button className="relative grid h-10 w-10 place-items-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
-      {children}
-      {badge && (
-        <>
-          {pulse && (
-            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-danger animate-ping opacity-60" />
-          )}
-          <Badge
-            variant="destructive"
-            className="absolute -top-0.5 -right-0.5 h-4 min-w-4 px-1 text-[9px] font-bold rounded-full grid place-items-center"
-          >
-            {badge}
-          </Badge>
-        </>
-      )}
-    </button>
-  );
-}
 
 type Msg = { id: string; from: string; initials: string; text: string; time: string };
 type Notif = { id: string; title: string; desc: string; time: string; tone: "info" | "warn" | "ok" };
