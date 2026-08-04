@@ -181,11 +181,13 @@ function SidebarContent({ collapsed, onToggle }: { collapsed: boolean; onToggle:
                 <div className="text-[11px] text-muted-foreground truncate">Directrice</div>
               </div>
               <button
+                onClick={() => setLogoutOpen(true)}
                 className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-background hover:text-foreground transition-colors"
                 aria-label="Se déconnecter"
               >
                 <LogOut className="h-4 w-4" />
               </button>
+
             </>
           )}
         </div>
