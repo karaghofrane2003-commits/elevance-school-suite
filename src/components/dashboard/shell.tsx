@@ -355,11 +355,24 @@ function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Mon profil</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/profil">Mon profil</Link>
+            </DropdownMenuItem>
             <DropdownMenuItem>Paramètres</DropdownMenuItem>
-            <DropdownMenuItem>Aide & support</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/aide">Aide &amp; support</Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">Se déconnecter</DropdownMenuItem>
+            <DropdownMenuItem
+              className="text-destructive"
+              onSelect={(e) => {
+                e.preventDefault();
+                setLogoutOpen(true);
+              }}
+            >
+              Se déconnecter
+            </DropdownMenuItem>
+
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
