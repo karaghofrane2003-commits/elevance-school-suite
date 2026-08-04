@@ -268,7 +268,9 @@ function NavGroup({
 }
 
 function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
+  const [logoutOpen, setLogoutOpen] = useState(false);
   return (
+
     <header className="sticky top-0 z-30 h-[68px] border-b border-border bg-background/80 backdrop-blur-xl">
       <div className="flex h-full items-center gap-3 px-4 sm:px-6 lg:px-8">
         <button
