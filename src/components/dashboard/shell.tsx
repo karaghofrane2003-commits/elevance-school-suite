@@ -167,35 +167,42 @@ function SidebarContent({ collapsed, onToggle }: { collapsed: boolean; onToggle:
       <div className="border-t border-sidebar-border p-3">
         <div
           className={cn(
-            "flex items-center gap-3 rounded-xl p-2 hover:bg-sidebar-accent transition-colors cursor-pointer",
+            "flex items-center gap-3 rounded-xl p-2 hover:bg-sidebar-accent transition-colors",
             collapsed && "justify-center",
           )}
         >
-          <Avatar className="h-9 w-9 shrink-0 ring-2 ring-background">
-            <AvatarFallback className="bg-gradient-to-br from-primary to-[oklch(0.674_0.176_250)] text-primary-foreground text-xs font-semibold">
-              MD
-            </AvatarFallback>
-          </Avatar>
-          {!collapsed && (
-            <>
+          <Link
+            to="/profil"
+            className="flex min-w-0 flex-1 items-center gap-3"
+            title="Mon profil"
+          >
+            <Avatar className="h-9 w-9 shrink-0 ring-2 ring-background">
+              <AvatarFallback className="bg-gradient-to-br from-primary to-[oklch(0.674_0.176_250)] text-primary-foreground text-xs font-semibold">
+                MD
+              </AvatarFallback>
+            </Avatar>
+            {!collapsed && (
               <div className="min-w-0 flex-1">
                 <div className="text-sm font-semibold truncate">Marie Dubois</div>
                 <div className="text-[11px] text-muted-foreground truncate">Directrice</div>
               </div>
-              <button
-                onClick={() => setLogoutOpen(true)}
-                className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-background hover:text-foreground transition-colors"
-                aria-label="Se déconnecter"
-              >
-                <LogOut className="h-4 w-4" />
-              </button>
-
-            </>
+            )}
+          </Link>
+          {!collapsed && (
+            <button
+              onClick={() => setLogoutOpen(true)}
+              className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-background hover:text-foreground transition-colors"
+              aria-label="Se déconnecter"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
           )}
         </div>
       </div>
+      <LogoutDialog open={logoutOpen} onOpenChange={setLogoutOpen} />
     </>
   );
+
 }
 
 function NavGroup({
