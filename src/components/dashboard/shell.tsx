@@ -342,12 +342,8 @@ function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
           Nouveau
         </Button>
 
-        <IconAction badge="5">
-          <MessageCircle className="h-[18px] w-[18px]" />
-        </IconAction>
-        <IconAction badge="3" pulse>
-          <Bell className="h-[18px] w-[18px]" />
-        </IconAction>
+        <MessagesMenu />
+        <NotificationsMenu />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -428,32 +424,173 @@ function LogoutDialog({
 }
 
 
-function IconAction({
-  children,
-  badge,
-  pulse,
-}: {
-  children: ReactNode;
-  badge?: string;
-  pulse?: boolean;
-}) {
+
+type Msg = { id: string; from: string; initials: string; text: string; time: string };
+type Notif = { id: string; title: string; desc: string; time: string; tone: "info" | "warn" | "ok" };
+
+const initialMessages: Msg[] = [
+  { id: "m1", from: "Sophie Laurent", initials: "SL", text: "Le bulletin de 4e B est prêt à valider.", time: "il y a 5 min" },
+  { id: "m2", from: "Karim Benali", initials: "KB", text: "Demande de rendez-vous pour Lina (6e A).", time: "il y a 32 min" },
+  { id: "m3", from: "Claire Moreau", initials: "CM", text: "Absence prévue vendredi après-midi.", time: "il y a 1 h" },
+  { id: "m4", from: "Paul Girard", initials: "PG", text: "Liste des fournitures mise à jour.", time: "hier" },
+  { id: "m5", from: "Nadia Cherif", initials: "NC", text: "Paiement de scolarité reçu — Yanis M.", time: "hier" },
+];
+
+const initialNotifs: Notif[] = [
+  { id: "n1", title: "12 absences non justifiées", desc: "À traiter pour la journée du jour.", time: "il y a 10 min", tone: "warn" },
+  { id: "n2", title: "Nouvelle inscription", desc: "Emma Rousseau a été inscrite en CM2.", time: "il y a 2 h", tone: "ok" },
+  { id: "n3", title: "Annonce publiée", desc: "« Réunion parents-professeurs » est en ligne.", time: "il y a 4 h", tone: "info" },
+];
+
+function MessagesMenu() {
+  const [messages, setMessages] = useState(initialMessages);
+  const [unread, setUnread] = useState(messages.length);
   return (
-    <button className="relative grid h-10 w-10 place-items-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
-      {children}
-      {badge && (
-        <>
-          {pulse && (
-            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-danger animate-ping opacity-60" />
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          className="relative grid h-10 w-10 place-items-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          aria-label="Messagerie"
+        >
+          <MessageCircle className="h-[18px] w-[18px]" />
+          {unread > 0 && (
+            <Badge
+              variant="destructive"
+              className="absolute -top-0.5 -right-0.5 h-4 min-w-4 px-1 text-[9px] font-bold rounded-full grid place-items-center"
+            >
+              {unread}
+            </Badge>
           )}
-          <Badge
-            variant="destructive"
-            className="absolute -top-0.5 -right-0.5 h-4 min-w-4 px-1 text-[9px] font-bold rounded-full grid place-items-center"
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-[340px] p-0">
+        <div className="flex items-center justify-between px-3 py-2.5">
+          <div className="text-sm font-semibold">Messagerie</div>
+          <button
+            className="text-[11px] font-medium text-primary hover:underline disabled:opacity-40"
+            disabled={unread === 0}
+            onClick={() => setUnread(0)}
           >
-            {badge}
-          </Badge>
-        </>
-      )}
-    </button>
+            Tout marquer comme lu
+          </button>
+        </div>
+        <DropdownMenuSeparator className="m-0" />
+        <div className="max-h-[320px] overflow-y-auto py-1">
+          {messages.length === 0 ? (
+            <div className="px-3 py-8 text-center text-sm text-muted-foreground">
+              Aucun message.
+            </div>
+          ) : (
+            messages.map((m) => (
+              <button
+                key={m.id}
+                onClick={() => {
+                  setMessages((prev) => prev.filter((x) => x.id !== m.id));
+                  setUnread((u) => Math.max(0, u - 1));
+                }}
+                className="flex w-full gap-3 px-3 py-2.5 text-left hover:bg-muted/60 transition-colors"
+              >
+                <Avatar className="h-8 w-8 shrink-0">
+                  <AvatarFallback className="bg-muted text-[10px] font-semibold text-muted-foreground">
+                    {m.initials}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="truncate text-[13px] font-semibold">{m.from}</span>
+                    <span className="shrink-0 text-[10px] text-muted-foreground">{m.time}</span>
+                  </div>
+                  <p className="truncate text-xs text-muted-foreground">{m.text}</p>
+                </div>
+              </button>
+            ))
+          )}
+        </div>
+        <DropdownMenuSeparator className="m-0" />
+        <DropdownMenuItem asChild className="justify-center text-[12px] font-medium text-primary">
+          <Link to="/aide">Ouvrir la messagerie</Link>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function NotificationsMenu() {
+  const [notifs, setNotifs] = useState(initialNotifs);
+  const [unread, setUnread] = useState(initialNotifs.length);
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          className="relative grid h-10 w-10 place-items-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          aria-label="Notifications"
+        >
+          <Bell className="h-[18px] w-[18px]" />
+          {unread > 0 && (
+            <>
+              <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-danger animate-ping opacity-60" />
+              <Badge
+                variant="destructive"
+                className="absolute -top-0.5 -right-0.5 h-4 min-w-4 px-1 text-[9px] font-bold rounded-full grid place-items-center"
+              >
+                {unread}
+              </Badge>
+            </>
+          )}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-[340px] p-0">
+        <div className="flex items-center justify-between px-3 py-2.5">
+          <div className="text-sm font-semibold">Notifications</div>
+          <button
+            className="text-[11px] font-medium text-primary hover:underline disabled:opacity-40"
+            disabled={unread === 0}
+            onClick={() => setUnread(0)}
+          >
+            Tout marquer comme lu
+          </button>
+        </div>
+        <DropdownMenuSeparator className="m-0" />
+        <div className="max-h-[320px] overflow-y-auto py-1">
+          {notifs.length === 0 ? (
+            <div className="px-3 py-8 text-center text-sm text-muted-foreground">
+              Aucune notification.
+            </div>
+          ) : (
+            notifs.map((n) => (
+              <button
+                key={n.id}
+                onClick={() => {
+                  setNotifs((prev) => prev.filter((x) => x.id !== n.id));
+                  setUnread((u) => Math.max(0, u - 1));
+                }}
+                className="flex w-full gap-3 px-3 py-2.5 text-left hover:bg-muted/60 transition-colors"
+              >
+                <span
+                  className={cn(
+                    "mt-1.5 h-2 w-2 shrink-0 rounded-full",
+                    n.tone === "warn" && "bg-danger",
+                    n.tone === "ok" && "bg-success",
+                    n.tone === "info" && "bg-primary",
+                  )}
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="truncate text-[13px] font-semibold">{n.title}</span>
+                    <span className="shrink-0 text-[10px] text-muted-foreground">{n.time}</span>
+                  </div>
+                  <p className="truncate text-xs text-muted-foreground">{n.desc}</p>
+                </div>
+              </button>
+            ))
+          )}
+        </div>
+        <DropdownMenuSeparator className="m-0" />
+        <DropdownMenuItem asChild className="justify-center text-[12px] font-medium text-primary">
+          <Link to="/annonces">Voir toutes les activités</Link>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
