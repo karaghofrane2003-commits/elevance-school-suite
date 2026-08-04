@@ -377,10 +377,45 @@ function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <LogoutDialog open={logoutOpen} onOpenChange={setLogoutOpen} />
       </div>
     </header>
   );
 }
+
+function LogoutDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+}) {
+  const navigate = useNavigate();
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Se déconnecter ?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Vous serez redirigé vers la page de connexion. Les modifications non enregistrées
+            seront perdues.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Annuler</AlertDialogCancel>
+          <AlertDialogAction
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            onClick={() => navigate({ to: "/connexion" })}
+          >
+            Se déconnecter
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
 
 function IconAction({
   children,
