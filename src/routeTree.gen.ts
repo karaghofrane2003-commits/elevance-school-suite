@@ -11,11 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProfilRouteImport } from './routes/profil'
 import { Route as ProfesseursRouteImport } from './routes/professeurs'
+import { Route as ParentsRouteImport } from './routes/parents'
 import { Route as ElevesRouteImport } from './routes/eleves'
 import { Route as ConnexionRouteImport } from './routes/connexion'
 import { Route as ClassesRouteImport } from './routes/classes'
 import { Route as AnnoncesRouteImport } from './routes/annonces'
 import { Route as AideRouteImport } from './routes/aide'
+import { Route as AbsencesRouteImport } from './routes/absences'
 import { Route as IndexRouteImport } from './routes/index'
 
 const ProfilRoute = ProfilRouteImport.update({
@@ -26,6 +28,11 @@ const ProfilRoute = ProfilRouteImport.update({
 const ProfesseursRoute = ProfesseursRouteImport.update({
   id: '/professeurs',
   path: '/professeurs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParentsRoute = ParentsRouteImport.update({
+  id: '/parents',
+  path: '/parents',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ElevesRoute = ElevesRouteImport.update({
@@ -53,6 +60,11 @@ const AideRoute = AideRouteImport.update({
   path: '/aide',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AbsencesRoute = AbsencesRouteImport.update({
+  id: '/absences',
+  path: '/absences',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -61,32 +73,38 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/absences': typeof AbsencesRoute
   '/aide': typeof AideRoute
   '/annonces': typeof AnnoncesRoute
   '/classes': typeof ClassesRoute
   '/connexion': typeof ConnexionRoute
   '/eleves': typeof ElevesRoute
+  '/parents': typeof ParentsRoute
   '/professeurs': typeof ProfesseursRoute
   '/profil': typeof ProfilRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/absences': typeof AbsencesRoute
   '/aide': typeof AideRoute
   '/annonces': typeof AnnoncesRoute
   '/classes': typeof ClassesRoute
   '/connexion': typeof ConnexionRoute
   '/eleves': typeof ElevesRoute
+  '/parents': typeof ParentsRoute
   '/professeurs': typeof ProfesseursRoute
   '/profil': typeof ProfilRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/absences': typeof AbsencesRoute
   '/aide': typeof AideRoute
   '/annonces': typeof AnnoncesRoute
   '/classes': typeof ClassesRoute
   '/connexion': typeof ConnexionRoute
   '/eleves': typeof ElevesRoute
+  '/parents': typeof ParentsRoute
   '/professeurs': typeof ProfesseursRoute
   '/profil': typeof ProfilRoute
 }
@@ -94,42 +112,50 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/absences'
     | '/aide'
     | '/annonces'
     | '/classes'
     | '/connexion'
     | '/eleves'
+    | '/parents'
     | '/professeurs'
     | '/profil'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/absences'
     | '/aide'
     | '/annonces'
     | '/classes'
     | '/connexion'
     | '/eleves'
+    | '/parents'
     | '/professeurs'
     | '/profil'
   id:
     | '__root__'
     | '/'
+    | '/absences'
     | '/aide'
     | '/annonces'
     | '/classes'
     | '/connexion'
     | '/eleves'
+    | '/parents'
     | '/professeurs'
     | '/profil'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AbsencesRoute: typeof AbsencesRoute
   AideRoute: typeof AideRoute
   AnnoncesRoute: typeof AnnoncesRoute
   ClassesRoute: typeof ClassesRoute
   ConnexionRoute: typeof ConnexionRoute
   ElevesRoute: typeof ElevesRoute
+  ParentsRoute: typeof ParentsRoute
   ProfesseursRoute: typeof ProfesseursRoute
   ProfilRoute: typeof ProfilRoute
 }
@@ -148,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/professeurs'
       fullPath: '/professeurs'
       preLoaderRoute: typeof ProfesseursRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parents': {
+      id: '/parents'
+      path: '/parents'
+      fullPath: '/parents'
+      preLoaderRoute: typeof ParentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/eleves': {
@@ -185,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AideRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/absences': {
+      id: '/absences'
+      path: '/absences'
+      fullPath: '/absences'
+      preLoaderRoute: typeof AbsencesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -197,14 +237,26 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AbsencesRoute: AbsencesRoute,
   AideRoute: AideRoute,
   AnnoncesRoute: AnnoncesRoute,
   ClassesRoute: ClassesRoute,
   ConnexionRoute: ConnexionRoute,
   ElevesRoute: ElevesRoute,
+  ParentsRoute: ParentsRoute,
   ProfesseursRoute: ProfesseursRoute,
   ProfilRoute: ProfilRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

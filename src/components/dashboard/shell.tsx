@@ -56,12 +56,12 @@ type NavItem = { label: string; icon: typeof LayoutDashboard; badge?: string; ac
 const navMain: NavItem[] = [
   { label: "Tableau de bord", icon: LayoutDashboard, to: "/" },
   { label: "Élèves", icon: GraduationCap, badge: "842", to: "/eleves" },
-  { label: "Parents", icon: Users2 },
+  { label: "Parents", icon: Users2, to: "/parents" },
   { label: "Professeurs", icon: UserSquare2, to: "/professeurs" },
   { label: "Classes", icon: School, to: "/classes" },
   { label: "Annonces", icon: Megaphone, badge: "3", to: "/annonces" },
   { label: "Calendrier", icon: CalendarDays },
-  { label: "Absences", icon: UserX, badge: "12" },
+  { label: "Absences", icon: UserX, badge: "12", to: "/absences" },
   { label: "Messages", icon: MessageSquare, badge: "5" },
 ];
 
